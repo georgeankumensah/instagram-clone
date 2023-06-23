@@ -3,7 +3,9 @@ import fonts from '../../theme/fonts';
 import colors from '../../theme/colors';
 
 export default StyleSheet.create({
-  post: {},
+  post: {
+    // backgroundColor: colors.white,
+  },
   image: {
     width: '100%',
     aspectRatio: 1,
@@ -14,8 +16,8 @@ export default StyleSheet.create({
     padding: 10,
   },
   userAvatar: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     borderRadius: 25,
     marginRight: 10,
   },

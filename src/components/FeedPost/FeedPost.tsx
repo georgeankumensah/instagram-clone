@@ -1,5 +1,9 @@
 import {useState} from 'react';
-import {Text, View,  Image} from 'react-native';
+import {
+  Text,
+  View,
+  Image,
+} from 'react-native';
 import colors from '../../theme/colors';
 import fonts from '../../theme/fonts';
 import Antdesigns from 'react-native-vector-icons/AntDesign';
@@ -8,9 +12,27 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 
 import styles from './styles';
+import Comment from '../comments/Comment';
+import DoublePressable from '../DoublePressable';
+import {IPost, IComment} from '../../types/models';
 
-const FeedPost = () => {
+interface IFeedPost {
+  post: IPost;
+  comment: IComment;
+}
+
+const FeedPost = ({post}: IFeedPost) => {
   const [isLiked, setIsLiked] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  const toggleDescriptionExpanded = () => {
+    setIsDescriptionExpanded(v => !v);
+  };
+  const toggleLiked = () => {
+    setIsLiked(v => !v);
+  };
+
+ 
 
   return (
     <View style={styles.post}>
@@ -18,11 +40,11 @@ const FeedPost = () => {
       <View style={styles.header}>
         <Image
           source={{
-            uri: 'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/1.jpg',
+            uri: post.user.image,
           }}
           style={styles.userAvatar}
         />
-        <Text style={styles.username}>Blaccgeorge</Text>
+        <Text style={styles.username}>{post.user.username}</Text>
         <Entypo
           name="dots-three-horizontal"
           size={16}
@@ -30,12 +52,14 @@ const FeedPost = () => {
         />
       </View>
       {/* content */}
-      <Image
-        source={{
-          uri: 'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/images/1.jpg',
-        }}
-        style={styles.image}
-      />
+      <DoublePressable onDoublePress={toggleLiked}>
+        <Image
+          source={{
+            uri: post.image,
+          }}
+          style={styles.image}
+        />
+      </DoublePressable>
       {/* footer*/}
 
       <View style={styles.footer}>
@@ -43,8 +67,9 @@ const FeedPost = () => {
           <Antdesigns
             name={isLiked ? 'heart' : 'hearto'}
             size={24}
-            color={isLiked ? colors.red : colors.black}
+            color={isLiked ? colors.accent : colors.black}
             style={styles.icon}
+            onPress={toggleLiked}
           />
           <Ionicons
             name="chatbubble-outline"
@@ -67,34 +92,27 @@ const FeedPost = () => {
         </View>
 
         <Text style={styles.text}>
-          Liked by <Text style={styles.username}>Blaccgeorge</Text> and{' '}
-          <Text style={styles.username}>66 others</Text>
+          Liked by <Text style={styles.username}>{post.user.username}</Text> and{' '}
+          <Text style={styles.username}>{post.nofLikes} others</Text>
         </Text>
         {/* caption */}
-        <Text style={styles.text}>
-          <Text style={styles.username}>Blaccgeorge</Text> Lorem ipsum dolor sit
-          amet consectetur adipisicing elit. Quisquam, voluptatum.
+        <Text style={styles.text} numberOfLines={isDescriptionExpanded ? 0 : 3}>
+          <Text style={styles.username}>{post.user.username}</Text>{' '}
+          {post.description}
+        </Text>
+        <Text onPress={toggleDescriptionExpanded}>
+          {isDescriptionExpanded ? 'show less' : 'show more'}
         </Text>
         {/* comments */}
-        <Text>View all 20 comments</Text>
-        <View style={styles.comments}>
-          <Text style={styles.commentText}>
-            <Text style={styles.username}>Blaccgeorge</Text> Lorem ipsum dolor
-            sit amet consectetur adipisicing elit. Quisquam, voluptatum.
-          </Text>
-          <Antdesigns
-            name="hearto"
-            size={12}
-            style={styles.icon}
-            color={colors.black}
-          />
-        </View>
+        <Text>View all {post.nofComments} comments</Text>
+        {post.comments.map(comment => (
+          <Comment key={comment.id} comment={comment} />
+        ))}
 
         {/* post date */}
-        <Text >1 hour ago</Text>
+        <Text>{post.createdAt}</Text>
       </View>
     </View>
   );
 };
 export default FeedPost;
-
